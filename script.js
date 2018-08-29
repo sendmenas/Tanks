@@ -16,14 +16,15 @@ const config = {
 };
 
 let game = new Phaser.Game(config);
-let player, cursor, bullet;
+let player, cursor, bullet, brick;
 let playerBulletLive = false;
 let playerDirection = 'up';
 
 function preload() {
+    this.load.image('brick', 'assets/wall_bricks/wall_bricks.png');
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('tile1', 'assets/bgr_tile_01.png');
-    this.load.image('tile1', 'assets/bgr_tile_02.png');
+    this.load.image('tile2', 'assets/bgr_tile_02.png');
     this.load.spritesheet('tank', 'assets/player_tank/player_tank.png', {
         frameHeight: 100,
         frameWidth: 100
@@ -41,6 +42,10 @@ function create() {
             
         }
     }
+
+    bricks = this.physics.add.staticGroup();
+    bricks.create(400, 150, 'brick');
+
     player = this.physics.add.sprite(400, 600, 'tank');
     player.setCollideWorldBounds(true);
    
@@ -73,6 +78,8 @@ function create() {
     });
 
     cursor = this.input.keyboard.createCursorKeys();
+
+    this.physics.add.collider(player, bricks);
 }
 
 function update() {
@@ -126,12 +133,17 @@ function update() {
                 break;
         }
         bullet.setCollideWorldBounds(true);
+        this.physics.add.overlap(bricks, bullet, bulletHit, null, this);
     }
 
     if (bullet != null) {
         if (bullet.body.onCeiling() || bullet.body.onFloor() || bullet.body.onWall()) {
-            playerBulletLive = false;
-            bullet.disableBody(true, true);
+            bulletHit();
         }
     }
+}
+
+function bulletHit() {
+    playerBulletLive = false;
+    bullet.disableBody(true, true);
 }
