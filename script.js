@@ -22,6 +22,7 @@ let playerDirection = 'up';
 
 function preload() {
     this.load.image('brick', 'assets/wall_bricks/wall_bricks.png');
+    this.load.image('brickTop', 'assets/wall_bricks/wall_bricks_top.png');
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('tile1', 'assets/bgr_tile_01.png');
     this.load.image('tile2', 'assets/bgr_tile_02.png');
@@ -133,17 +134,25 @@ function update() {
                 break;
         }
         bullet.setCollideWorldBounds(true);
-        this.physics.add.overlap(bricks, bullet, bulletHit, null, this);
+        this.physics.add.overlap(bricks, bullet, bulletBrickHit, null, this);
     }
 
     if (bullet != null) {
         if (bullet.body.onCeiling() || bullet.body.onFloor() || bullet.body.onWall()) {
-            bulletHit();
+            bulletBoundsHit();
         }
     }
 }
 
-function bulletHit() {
+function bulletBoundsHit() {
     playerBulletLive = false;
     bullet.disableBody(true, true);
+    bullet = null;
+}
+
+function bulletBrickHit(bullet, brick) {
+    brick.width = 50;
+    brick.height = 50;
+    brick.setCrop(0, 0, 50, 50);
+    console.log(brick);
 }
